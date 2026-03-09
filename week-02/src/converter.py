@@ -1,11 +1,11 @@
 #Constants
-# Kilometrus ↔ jūdzes (1 km = 0.621371 mi)
+# Kilometrus ↔ judzes (1 km = 0.621371 mi)
 KM_TO_MI = 0.621371
-# Kilogramus ↔ mārciņas (1 kg = 2.20462 lb)
+#Kilogramus ↔ marcinas (1 kg = 2.20462 lb)
 KG_TO_LB = 2.20462
-# Litrus ↔ galonus (1 L = 0.264172 gal)
+#Litrus ↔ galonus (1 L = 0.264172 gal)
 L_TO_GAL = 0.264172
-# Dolāri ↔ Eiro (1 $ = 0.84235020 €)
+#Dolari ↔ Eiro (1 $ = 0.84235020 €)
 USD_TO_EUR = 0.84235020
 
 
