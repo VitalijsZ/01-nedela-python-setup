@@ -4,7 +4,7 @@ import os
 FILE_PATH = "shopping_list/shopping.json"
 
 
-def load_data():
+def load_list():
     """Nolasa datus no JSON faila. Ja fails neeksistē, atgriež []."""
     if not os.path.exists(FILE_PATH):
         return []
@@ -13,7 +13,7 @@ def load_data():
         return json.load(f)
 
 
-def save_data(data):
+def save_list(items):
     """Saglabā datus JSON failā."""
     with open(FILE_PATH, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
+        json.dump(items, f, indent=2, ensure_ascii=False)
