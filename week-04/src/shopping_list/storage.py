@@ -1,7 +1,8 @@
 import json
 import os
 
-FILE_PATH = "shopping_list/shopping.json"
+BASE_DIR = os.path.dirname(__file__)
+FILE_PATH = os.path.join(BASE_DIR, "shopping.json")
 
 
 def load_list():
