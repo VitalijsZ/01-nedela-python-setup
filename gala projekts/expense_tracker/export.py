@@ -1,17 +1,21 @@
 import csv
 
-def export_to_csv(expenses, filename="expenses.csv"):
-    with open(filename, "w", newline="", encoding="utf-8") as f:
+def export_to_csv(expenses, filepath):
+    """
+    Eksportē izdevumus CSV failā.
+    """
+
+    with open(filepath, "w", newline="", encoding="utf-8-sig") as f:
         writer = csv.writer(f)
 
         # header
-        writer.writerow(["date", "amount", "category", "description"])
+        writer.writerow(["Datums", "Summa", "Kategorija", "Apraksts"])
 
         # data
-        for exp in expenses:
+        for expense in expenses:
             writer.writerow([
-                exp["date"],
-                exp["amount"],
-                exp["category"],
-                exp["description"]
+                expense["date"],
+                f"{expense['amount']:.2f}",
+                expense["category"],
+                expense["description"],
             ])

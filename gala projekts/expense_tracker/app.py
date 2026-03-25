@@ -2,7 +2,9 @@ from storage import load_expenses, save_expenses
 from logic import add_expense, delete_expense
 from logic import filter_by_month, sum_by_category, sum_total, get_available_months
 from export import export_to_csv
+from datetime import datetime
 
+# Kategoriju saraksts
 CATEGORIES = [
     "Ēdiens",
     "Transports",
@@ -13,10 +15,13 @@ CATEGORIES = [
     "Cits",
 ]
 
+
 def main():
+    # Ielādē datus no JSON faila
     expenses = load_expenses()
 
     while True:
+        # ====== IZVĒLNE ======
         print("""
         1) Pievienot izdevumu
         2) Parādīt izdevumus
@@ -26,74 +31,123 @@ def main():
         6) Eksportēt CSV
         7) Iziet
         """)
+
         choice = input("Izvēlies darbību (1-7): ")
+
+        # Validācija — jāievada cipars
         if not choice.isdigit():
             print("Kļūda: jāievada cipars!")
             continue
-        # 1) Pievienot izdevumu
-        if choice == "1":
-            date = input("Date (YYYY-MM-DD): ")
-            try:
-                amount = float(input("Amount: "))
-            except ValueError:
-                print("Kļūda: jāievada skaitlis!")
-                continue
 
+        # =========================
+        # 1) PIEVIENOT IZDEVUMU
+        # =========================
+        if choice == "1":
+
+            # Datuma validācija
+            while True:
+                date = input("Datums (YYYY-MM-DD): ")
+
+                try:
+                    datetime.strptime(date, "%Y-%m-%d")
+                    break
+                except ValueError:
+                    print("Kļūda: nepareizs datuma formāts! Mēģini vēlreiz.")
+
+            # Summa
+            while True:
+                try:
+                    amount = float(input("Summa (EUR): "))
+                    if amount <= 0:
+                        print("Kļūda: summai jābūt pozitīvai!")
+                        continue
+                    break
+                except ValueError:
+                    print("Kļūda: jāievada skaitlis! Mēģini vēlreiz.")
+
+            # Kategorijas izvēle
             print("\nKategorija:")
             for i, cat in enumerate(CATEGORIES, 1):
                 print(f"  {i}) {cat}")
 
-            cat_choice = input("Izvēlies kategoriju: ")
+            while True:
+                cat_choice = input("Izvēlies kategoriju: ")
 
-            if not cat_choice.isdigit():
-                print("Kļūda: jāievada cipars!")
-                continue
+                if not cat_choice.isdigit():
+                    print("Kļūda: jāievada cipars!")
+                    continue
 
-            cat_index = int(cat_choice)
+                cat_index = int(cat_choice)
 
-            if cat_index < 1 or cat_index > len(CATEGORIES):
-                print("Kļūda: nepareiza izvēle!")
-                continue
+                if 1 <= cat_index <= len(CATEGORIES):
+                    category = CATEGORIES[cat_index - 1]
+                    break
+                else:
+                    print("Kļūda: nepareiza izvēle!")
 
-            category = CATEGORIES[cat_index - 1]
+            # Apraksts
+            while True:
+                # Noņem liekās atstarpes no ievadītā teksta sākuma un beigām
+                description = input("Apraksts: ").strip()
+                if description:
+                    break
+                print("Kļūda: apraksts nedrīkst būt tukšs!")
 
-            description = input("Description: ")
+            # Pievieno un saglabā
+            expenses = add_expense(expenses, date, amount, category, description)
+            save_expenses(expenses)
 
             print(f"\n✓ Pievienots: {date} | {category} | {amount:.2f} EUR | {description}")
 
-            expenses = add_expense(expenses, date, amount, category, description)
-            save_expenses(expenses)    
-
-
-        # 2) Parādīt izdevumus
+        # =========================
+        # 2) PARĀDĪT IZDEVUMUS
+        # =========================
         elif choice == "2":
+
             if not expenses:
-                
                 print("Saraksts ir tukšs.")
+                continue
 
-            else:
-                print(f"ID   Datums       Summa          Kategorija     Apraksts \n"
-                        f"------------------------------------------------------- ")
-                    # izdrukā sarakstu
-                for exp in expenses:
-                    print(f"{exp['id']:<3} | {exp['date']:<10} | {exp['amount']:<8.2f} EUR | {exp['category']:<10} | {exp['description']}")
-                    
-                print(f"------------------------------------------------------- ")
+            # Header
+            print("ID   Datums       Summa      Kategorija     Apraksts")
+            print("-" * 60)
 
-                total = sum_total(expenses)
+            # Izdrukā visus izdevumus
+            for exp in expenses:
+                print(f"{exp['id']:<3} | {exp['date']:<10} | {exp['amount']:<8.2f} EUR | {exp['category']:<10} | {exp['description']}")
 
-                print(f"\nKopā: {total:.2f} EUR ({len(expenses)} ieraksti)")
+            print("-" * 60)
 
+            # Kopējā summa
+            total = sum_total(expenses)
+            print(f"\nKopā: {total:.2f} EUR ({len(expenses)} ieraksti)")
 
-        # 3) Filtrēt pēc mēneša
+        # =========================
+        # 3) FILTRĒT PĒC MĒNEŠA
+        # =========================
         elif choice == "3":
+
             months = get_available_months(expenses)
+
+            if not months:
+                print("Nav datu.")
+                continue
 
             print("\nPieejamie mēneši:")
             for i, m in enumerate(months, 1):
                 print(f"{i}) {m}")
 
-            choice_month = int(input("Izvēlies mēnesi: "))
+            choice_month = input("Izvēlies mēnesi: ")
+
+            if not choice_month.isdigit():
+                print("Kļūda: jāievada cipars!")
+                continue
+
+            choice_month = int(choice_month)
+
+            if choice_month < 1 or choice_month > len(months):
+                print("Kļūda: nepareiza izvēle!")
+                continue
 
             selected_month = months[choice_month - 1]
 
@@ -105,14 +159,16 @@ def main():
             print(f"\n{selected_month} izdevumi:\n")
 
             for exp in filtered:
-                print(f"{exp['date']} | {exp['amount']} EUR | {exp['category']} | {exp['description']}")
+                print(f"{exp['date']} | {exp['amount']:.2f} EUR | {exp['category']} | {exp['description']}")
 
-            print(f"\nKopā: {sum_total(filtered)} EUR ({len(filtered)} ieraksti)")
+            print(f"\nKopā: {sum_total(filtered):.2f} EUR ({len(filtered)} ieraksti)")
 
-        # 4) Kopsavilkums pa kategorijām
+        # =========================
+        # 4) KOPSAVILKUMS
+        # =========================
         elif choice == "4":
+
             totals = sum_by_category(expenses)
-            total_sum = sum_total(expenses)
 
             if not totals:
                 print("Nav datu.")
@@ -124,10 +180,13 @@ def main():
                 print(f"{category}: {amount:.2f} EUR")
 
             print("\n----------------------")
-            print(f"KOPĀ: {total_sum:.2f} EUR")
+            print(f"KOPĀ: {sum_total(expenses):.2f} EUR")
 
-        # 5) Dzēst izdevumu
+        # =========================
+        # 5) DZĒST IZDEVUMU
+        # =========================
         elif choice == "5":
+
             if not expenses:
                 print("Nav izdevumu.")
                 continue
@@ -135,32 +194,51 @@ def main():
             print("\nIzdevumi:\n")
 
             for i, exp in enumerate(expenses, 1):
-                print(f"{i}) {exp['date']} | {exp['amount']} EUR | {exp['category']} | {exp['description']}")
+                print(f"{i}) {exp['date']} | {exp['amount']:.2f} EUR | {exp['category']} | {exp['description']}")
 
-            choice_delete = int(input("\nIzvēlies numuru dzēšanai: "))
+            choice_delete = input("\nKuru dzēst? (numurs vai 0 lai atceltu): ")
+            if choice_delete == "0":
+                print("Dzēšana atcelta.")
+                continue
+
+            if not choice_delete.isdigit():
+                print("Kļūda: jāievada cipars!")
+                continue
+
+            choice_delete = int(choice_delete)
 
             if choice_delete < 1 or choice_delete > len(expenses):
                 print("Kļūda: nepareiza izvēle!")
                 continue
 
-            # paņem pareizo expense
+            # Atrodam ID un dzēšam
             selected_expense = expenses[choice_delete - 1]
             expense_id = selected_expense["id"]
 
-            # dzēš pēc ID (iekšēji)
             expenses = delete_expense(expenses, expense_id)
             save_expenses(expenses)
 
             print("✓ Ieraksts dzēsts.")
 
-        # 6) Eksportēt CSV
+        # =========================
+        # 6) CSV EKSPORTS
+        # =========================
         elif choice == "6":
-            export_to_csv(expenses)
-            print("CSV fails veiksmīgi eksportēts: expenses.csv")
 
+            filepath = input("Ievadi faila nosaukumu (piemēram: expenses.csv): ")
 
-        # 7) Iziet
+            if not filepath:
+                filepath = "expenses.csv"
+
+            export_to_csv(expenses, filepath)
+
+            print(f"CSV fails veiksmīgi eksportēts: {filepath}")
+
+        # =========================
+        # 7) IZIET
+        # =========================
         elif choice == "7":
+            print("Uz redzēšanos!")
             break
 
 
