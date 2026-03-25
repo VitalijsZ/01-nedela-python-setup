@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+shopping.json
+prices.json

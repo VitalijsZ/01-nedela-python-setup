@@ -38,7 +38,6 @@ def add_expense(expenses, date, amount, category, description):
     }
 
     expenses.append(new_expense)
-
     return expenses
 
 
@@ -56,3 +55,52 @@ def delete_expense(expenses, expense_id):
             new_expenses.append(exp)
 
     return new_expenses
+
+
+# =========================
+# ANALYTICS
+# =========================
+
+def filter_by_month(expenses, year, month):
+    target = f"{year}-{month}"
+    result = []
+
+    for exp in expenses:
+        if exp["date"][:7] == target:
+            result.append(exp)
+
+    return result
+
+
+def sum_total(expenses):
+    total = 0
+
+    for exp in expenses:
+        total += exp["amount"]
+
+    return total
+
+
+def sum_by_category(expenses):
+    totals = {}
+
+    for exp in expenses:
+        category = exp["category"]
+
+        if category not in totals:
+            totals[category] = 0
+
+        totals[category] += exp["amount"]
+
+    return totals
+
+
+def get_available_months(expenses):
+    months = set()
+
+    for exp in expenses:
+        month = exp["date"][:7]  # YYYY-MM
+        months.add(month)
+
+    return sorted(months)
+

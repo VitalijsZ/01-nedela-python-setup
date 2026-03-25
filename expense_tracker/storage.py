@@ -9,7 +9,7 @@ import os
 BASE_DIR = os.path.dirname(__file__)
 
 # Pilns ceļš līdz JSON failam, kur glabājas izdevumi
-EXPENSES_FILE = os.path.join(BASE_DIR, "data", "expenses.json")
+EXPENSES_FILE = os.path.join(BASE_DIR, "expenses.json")
 
 
 # =========================
