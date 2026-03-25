@@ -1,8 +1,14 @@
 from storage import load_expenses, save_expenses
-from logic import add_expense, delete_expense
-from logic import filter_by_month, sum_by_category, sum_total, get_available_months
 from export import export_to_csv
 from datetime import datetime
+from logic import (
+    add_expense,
+    delete_expense,
+    filter_by_month,
+    sum_by_category,
+    sum_total,
+    get_available_months
+)
 
 # Kategoriju saraksts
 CATEGORIES = [
@@ -32,7 +38,7 @@ def main():
         7) Iziet
         """)
 
-        choice = input("Izvēlies darbību (1-7): ")
+        choice = input("Izvēlies darbību (1-7): ").strip()
 
         # Validācija — jāievada cipars
         if not choice.isdigit():
@@ -137,22 +143,25 @@ def main():
             for i, m in enumerate(months, 1):
                 print(f"{i}) {m}")
 
-            choice_month = input("Izvēlies mēnesi: ")
+            # Cikls līdz ievade ir pareiza
+            while True:
+                choice_month = input("Izvēlies mēnesi: ")
 
-            if not choice_month.isdigit():
-                print("Kļūda: jāievada cipars!")
-                continue
+                if not choice_month.isdigit():
+                    print("Kļūda: jāievada cipars!")
+                    continue
 
-            choice_month = int(choice_month)
+                choice_month = int(choice_month)
 
-            if choice_month < 1 or choice_month > len(months):
-                print("Kļūda: nepareiza izvēle!")
-                continue
+                if 1 <= choice_month <= len(months):
+                    break
+                else:
+                    print("Kļūda: nepareiza izvēle!")
 
             selected_month = months[choice_month - 1]
 
-            year = selected_month[:4]
-            month = selected_month[5:]
+            # Sadalam selected_month uz gadu un menesi
+            year, month = selected_month.split("-")
 
             filtered = filter_by_month(expenses, year, month)
 
@@ -225,7 +234,7 @@ def main():
         # =========================
         elif choice == "6":
 
-            filepath = input("Ievadi faila nosaukumu (piemēram: expenses.csv): ")
+            filepath = input("Ievadi faila nosaukumu (piemēram: expenses.csv): ").strip()
 
             if not filepath:
                 filepath = "expenses.csv"
