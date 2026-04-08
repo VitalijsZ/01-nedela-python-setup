@@ -13,9 +13,11 @@ Tā palīdz sekot līdzi personīgajiem tēriņiem un sadalīt tos pa kategorij�
 
 ## 2. Uzstādīšana
 
-git clone https://github.com/VitalijsZ/01-nedela-python-setup/tree/main/gala%20projekts/expense_tracker.git
-cd expense-tracker
-python app.py
+1. Atveram Command Prompt.
+2. Izvēlamies direktoriju, kur vēlamies saglabāt programmu: cd direktorija_ceļš (Piemērs: cd C:\Users\VitalijsZ)
+3. Izpildām komandu: git clone https://github.com/VitalijsZ/01-nedela-python-setup.git
+4. Pārejam uz expense_tracker mapi. (Piemērs: cd C:\Users\VitalijsZ\01-nedela-python-setup\gala projekts\expense_tracker)
+5. Palaižam programmu ar komandu: python app.py
 
 Nav nepieciešamas papildus bibliotēkas — nepieciešams tikai Python 3.10+.
 
